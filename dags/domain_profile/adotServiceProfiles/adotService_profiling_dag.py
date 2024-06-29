@@ -23,7 +23,6 @@ from airflow.sensors.hive_partition_sensor import HivePartitionSensor
 from airflow.sensors.web_hdfs_sensor import WebHdfsSensor
 from airflow.utils import timezone
 from airflow.utils.edgemodifier import Label
-from operators.custom_operators import BigQueryDoublePartitionExistenceSensor
 
 local_tz = pendulum.timezone("Asia/Seoul")
 
