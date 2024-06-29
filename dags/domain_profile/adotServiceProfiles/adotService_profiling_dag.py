@@ -17,37 +17,24 @@ from airflow.operators.python_operator import BranchPythonOperator, PythonOperat
 from airflow.providers.google.cloud.sensors.bigquery import (
     BigQueryTablePartitionExistenceSensor,
 )
+from airflow.models.variable import Variable
 from airflow.providers.sktvane.operators.nes import NesOperator
 from airflow.sensors.hive_partition_sensor import HivePartitionSensor
 from airflow.sensors.web_hdfs_sensor import WebHdfsSensor
 from airflow.utils import timezone
 from airflow.utils.edgemodifier import Label
-
-##
-from macros.jh_slack import CallbackNotifier
 from operators.custom_operators import BigQueryDoublePartitionExistenceSensor
 
 local_tz = pendulum.timezone("Asia/Seoul")
 
 ### 
 conn_id = 'slack_conn'
-CallbackNotifier.SLACK_CONN_ID = conn_id
 
-env='stg'
-aidp_project_id = "skt-datahub"
-
-SELECTED_TASK_IDS = []
-SELECTED_TASK_IDS.extend(["preprocess_adot", "preprocess_edd", "preprocess_edd_lag", "recgpt_item_list", "recgpt_item_list_train", "build_vocab", "onemodelV3_input_train"])
-CallbackNotifier.SELECTED_TASK_IDS = SELECTED_TASK_IDS
-
-###
-
+env = Variable.get("env", "stg")
+gcp_project_id = Variable.get("GCP_PROJECT_ID", "skt-datahub")
 
 default_args = {
     "retries": 100,
-    "on_success_callback" :  CallbackNotifier.on_success_callback,
-    "on_failure_callback": CallbackNotifier.on_failure_callback,
-    "on_retry_callback": CallbackNotifier.on_retry_callback,
     "depends_on_past": True
 }
 
@@ -56,11 +43,11 @@ with DAG(
     dag_id=f"adotServiceProfiles_{env}",
     default_args=default_args,
     description="DAG with own plugins",
-    schedule="0 5 * * *",
+    schedule="30 5 * * *",
     start_date=pendulum.datetime(2024, 6, 22, tz=local_tz),
     catchup=True,
     max_active_runs=1,
-    tags=["onemodel_v3_datapipe_test"],
+    tags=["adotServiceProfiles"],
     
 ) as dag: 
     
