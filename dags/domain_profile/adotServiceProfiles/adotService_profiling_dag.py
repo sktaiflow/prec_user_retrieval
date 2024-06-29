@@ -61,23 +61,23 @@ with DAG(
     profile_adot =  NesOperator(
         task_id="profile_adot",
         parameters={"current_dt": "{{ ds }}", "state": "stg", "duration": "30"},
-        input_nb="./notebook/profiling_adot.ipynb",
+        input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_adot.ipynb",
     )
     profile_tdeal =  NesOperator(
         task_id="profile_tdeal",
         parameters={"current_dt": "{{ ds }}", "state": "stg", "duration": "30"},
-        input_nb="./notebook/profiling_tdeal.ipynb",
+        input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_tdeal.ipynb",
     )
 
     profile_tmap =  NesOperator(
         task_id="profile_tmap",
         parameters={"current_dt": "{{ ds }}", "state": "stg", "duration": "30"},
-        input_nb="./notebook/profiling_tmap.ipynb",
+        input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_tmap.ipynb",
     )
     profile_xdr =  NesOperator(
         task_id="profile_xdr",
         parameters={"current_dt": "{{ ds }}", "state": "stg", "duration": "30"},
-        input_nb="./notebook/profiling_xdr.ipynb",
+        input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_xdr.ipynb",
     )
     start >> [profile_adot, profile_tdeal, profile_tmap, profile_xdr] >> end_profiling
 
