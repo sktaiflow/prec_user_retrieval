@@ -60,7 +60,7 @@ with DAG(
 
     profile_adot =  NesOperator(
         task_id="profile_adot",
-        parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60"},
+        parameters={"current_dt": "{{ macros.ds_add(ds, 2) }}", "state": env, "log_duration": "60"},
         input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_adot.ipynb",
     )
     profile_tdeal =  NesOperator(
