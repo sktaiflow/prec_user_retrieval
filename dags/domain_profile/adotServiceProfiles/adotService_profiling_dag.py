@@ -31,7 +31,11 @@ conn_id = 'slack_conn'
 
 env = Variable.get("env", "stg")
 gcp_project_id = Variable.get("GCP_PROJECT_ID", "skt-datahub")
-
+if env=='prd':
+    aidp_db_name = "adot_reco"
+else:
+    aidp_db_name = "adot_reco_dev"
+    
 default_args = {
     "retries": 100,
     "depends_on_past": True
