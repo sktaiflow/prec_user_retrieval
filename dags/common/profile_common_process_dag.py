@@ -17,26 +17,25 @@ from airflow.operators.python_operator import BranchPythonOperator, PythonOperat
 from airflow.providers.google.cloud.sensors.bigquery import (
     BigQueryTablePartitionExistenceSensor,
 )
+from airflow.models.variable import Variable
+
 from airflow.providers.sktvane.operators.nes import NesOperator
 from airflow.sensors.hive_partition_sensor import HivePartitionSensor
 from airflow.sensors.web_hdfs_sensor import WebHdfsSensor
 from airflow.utils import timezone
 from airflow.utils.edgemodifier import Label
 
-##
-from macros.jh_slack import CallbackNotifier
-from operators.custom_operators import BigQueryDoublePartitionExistenceSensor
-
 local_tz = pendulum.timezone("Asia/Seoul")
 
 ### 
 conn_id = 'slack_conn'
-CallbackNotifier.SLACK_CONN_ID = conn_id
 
-env='stg'
-aidp_project_id = "skt-datahub"
-aidp_db_name = "adot_reco"
-
+env = Variable.get("env", "stg")
+gcp_project_id = Variable.get("GCP_PROJECT_ID", "skt-datahub")
+if env=='prd':
+    aidp_db_name = "adot_reco"
+else:
+    aidp_db_name = "adot_reco_dev"
 
 default_args = {
     "retries": 100,
