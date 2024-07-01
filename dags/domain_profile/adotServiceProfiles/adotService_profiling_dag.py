@@ -30,12 +30,14 @@ local_tz = pendulum.timezone("Asia/Seoul")
 conn_id = 'slack_conn'
 
 env = Variable.get("env", "stg")
+hdfs_root_path = Variable.get("hdfs_root_path", "/data/adot/jaehwan")
 gcp_project_id = Variable.get("GCP_PROJECT_ID", "skt-datahub")
-if env=='prd':
-    aidp_db_name = "adot_reco"
-else:
-    aidp_db_name = "adot_reco_dev"
-    
+nudge_api_token = Variable.get("nudge_offering_token", None)
+if nudge_api_token is None:
+    raise Exception("token is None")
+
+aidp_db_name = "adot_reco" if env == 'prd' else "adot_reco_dev"
+
 default_args = {
     "retries": 100,
     "depends_on_past": True
@@ -76,8 +78,16 @@ with DAG(
     )
     profile_xdr =  NesOperator(
         task_id="profile_xdr",
-        parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60"},
+        parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "30"},
         input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_xdr.ipynb",
     )
+
+    nudge_offering_table =  NesOperator(
+        task_id="nudge_offering_table",
+        parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60", "nudge_token": nudge_api_token},
+        input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_adot.ipynb",
+    )
+
+    start >> nudge_offering_table >> end_profiling
     start >> [profile_adot, profile_tdeal, profile_tmap, profile_xdr] >> end_profiling
 
