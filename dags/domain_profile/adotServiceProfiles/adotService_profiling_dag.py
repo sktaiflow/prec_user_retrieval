@@ -48,7 +48,7 @@ with DAG(
     dag_id=f"adotServiceProfiles_{env}",
     default_args=default_args,
     description="DAG with own plugins",
-    schedule="30 5 * * *",
+    schedule="0 22 * * *",
     start_date=pendulum.datetime(2024, 6, 22, tz=local_tz),
     catchup=True,
     max_active_runs=1,
