@@ -88,6 +88,14 @@ with DAG(
         input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_adot.ipynb",
     )
 
-    start >> nudge_offering_table >> end_profiling
-    start >> [profile_adot, profile_tdeal, profile_tmap, profile_xdr] >> end_profiling
+    profilePivotTable =  NesOperator(
+        task_id="profilePivotTable",
+        parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60"},
+        input_nb="./domain_profile/adotServiceProfiles/notebook/pivoting_profile.ipynb",
+    )
 
+
+    start >> nudge_offering_table >> end_profiling
+    start >> [profile_adot, profile_tdeal, profile_tmap, profile_xdr] >> profilePivotTable >> end_profiling
+
+    
