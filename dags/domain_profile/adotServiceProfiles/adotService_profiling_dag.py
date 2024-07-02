@@ -90,7 +90,7 @@ with DAG(
 
     profilePivotTable =  NesOperator(
         task_id="profilePivotTable",
-        parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60"},
+        parameters={"current_dt": "{{ ds }}", "state": env},
         input_nb="./domain_profile/adotServiceProfiles/notebook/pivoting_profile.ipynb",
     )
 
