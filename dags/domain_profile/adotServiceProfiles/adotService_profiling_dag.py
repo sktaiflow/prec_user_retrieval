@@ -82,8 +82,8 @@ with DAG(
         input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_xdr.ipynb",
     )
 
-    profile_xd_weekend =  NesOperator(
-        task_id="profile_xd_weekend",
+    profile_xdr_weekend =  NesOperator(
+        task_id="profile_xdr_weekend",
         parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60"},
         input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_xdr_weekend.ipynb",
     )
@@ -102,6 +102,6 @@ with DAG(
 
 
     start >> nudge_offering_table >> end_profiling
-    start >> [profile_adot, profile_tdeal, profile_tmap, profile_xdr, profile_xd_weekend] >> profilePivotTable >> end_profiling
+    start >> [profile_adot, profile_tdeal, profile_tmap, profile_xdr, profile_xdr_weekend] >> profilePivotTable >> end_profiling
 
     
