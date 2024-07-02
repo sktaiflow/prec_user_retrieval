@@ -71,7 +71,7 @@ with DAG(
         task_id="profile_adot_weekend",
         parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60"},
         #parameters={"current_dt": "{{ macros.ds_add(ds, 2) }}", "state": env, "log_duration": "60"},
-        input_nb="./domain_profile/adotServiceProfiles/notebook/profile_adot_weekend.ipynb",
+        input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_adot_weekend.ipynb",
     )
 
     profile_tdeal =  NesOperator(
