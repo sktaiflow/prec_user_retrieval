@@ -65,6 +65,13 @@ with DAG(
         parameters={"current_dt": "{{ macros.ds_add(ds, 2) }}", "state": env, "log_duration": "60"},
         input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_adot.ipynb",
     )
+
+    profile_adot_weekend =  NesOperator(
+        task_id="profile_adot_weekend",
+        parameters={"current_dt": "{{ macros.ds_add(ds, 2) }}", "state": env, "log_duration": "60"},
+        input_nb="./domain_profile/adotServiceProfiles/notebook/profile_adot_weekend.ipynb",
+    )
+
     profile_tdeal =  NesOperator(
         task_id="profile_tdeal",
         parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60"},
@@ -102,6 +109,6 @@ with DAG(
 
 
     start >> nudge_offering_table >> end_profiling
-    start >> [profile_adot, profile_tdeal, profile_tmap, profile_xdr, profile_xdr_weekend] >> profilePivotTable >> end_profiling
+    start >> [profile_adot, profile_tdeal, profile_tmap, profile_xdr, profile_xdr_weekend, profile_adot_weekend] >> profilePivotTable >> end_profiling
 
     
