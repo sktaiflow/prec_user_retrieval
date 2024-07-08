@@ -78,7 +78,7 @@ with DAG(
     st11_cat1_cnt =  NesOperator(
         task_id="st11_cat1_cnt",
         parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
-        input_nb=f"{log_process_path}/p_st11_cat1.ipynb",
+        input_nb=f"{log_process_path}/p_11st_cat1.ipynb",
     )
 
     tdeal_cat1_cnt =  NesOperator(
