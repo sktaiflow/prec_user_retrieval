@@ -38,9 +38,9 @@ default_args = {
     "depends_on_past": True
 }
 
-common_process_notebook_path = "./preprocessing/notebook"
-log_process_path = f"./preprocessing/notebook/log"
-meta_process_path = f"./preprocessing/notebook/meta"
+common_process_notebook_path = "./common/preprocessing/notebook"
+log_process_path = f"{common_process_notebook_path}/log"
+meta_process_path = f"{common_process_notebook_path}/meta"
 
 
 with DAG(
