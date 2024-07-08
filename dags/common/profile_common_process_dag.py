@@ -61,48 +61,48 @@ with DAG(
     xdr_cat1_cnt =  NesOperator(
         task_id="xdr_cat1_cnt",
         parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
-        input_nb=f"{log_process_path}/xdr_cat1_cnt.ipynb",
+        input_nb=f"{log_process_path}/p_xdr_cat1.ipynb",
     )
 
     tmap_item_cnt =  NesOperator(
         task_id="tmap_item_cnt",
         parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
-        input_nb=f"{log_process_path}/tmap_item_cnt.ipynb",
+        input_nb=f"{log_process_path}/p_tmap_item.ipynb",
     )
     tmap_cat1_cnt =  NesOperator(
         task_id="tmap_cat1_cnt",
         parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
-        input_nb=f"{log_process_path}/tmap_cat1_cnt.ipynb",
+        input_nb=f"{log_process_path}/p_tmap_cat1.ipynb",
     )
 
     st11_cat1_cnt =  NesOperator(
         task_id="st11_cat1_cnt",
         parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
-        input_nb=f"{log_process_path}/st11_cat1_cnt.ipynb",
+        input_nb=f"{log_process_path}/p_st11_cat1.ipynb",
     )
 
     tdeal_cat1_cnt =  NesOperator(
         task_id="tdeal_cat1_cnt",
         parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
-        input_nb=f"{log_process_path}/tdeal_cat1_cnt.ipynb",
+        input_nb=f"{log_process_path}/p_tdeal_cat1.ipynb",
     )
 
     adot_cat1_cnt =  NesOperator(
         task_id="adot_cat1_cnt",
         parameters={"current_dt": "{{ macros.ds_add(ds, 2) }}", "state": env, "ttl": "30"},
-        input_nb=f"{log_process_path}/adot_cat1_cnt.ipynb",
+        input_nb=f"{log_process_path}/p_adot_cat1.ipynb",
     )
 
     adot_item_cnt =  NesOperator(
         task_id="adot_item_cnt",
         parameters={"current_dt": "{{ macros.ds_add(ds, 2) }}", "state": env, "ttl": "30"},
-        input_nb=f"{log_process_path}/adot_item_cnt.ipynb",
+        input_nb=f"{log_process_path}/p_adot_item.ipynb",
     )
 
     tmbr_item_cnt = NesOperator(
         task_id="tmbr_item_cnt",
         parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
-        input_nb=f"{log_process_path}/adot_item_cnt.ipynb",
+        input_nb=f"{log_process_path}/p_tmbr_item.ipynb",
     )
 
     # tmbr_meta_table = NesOperator(
