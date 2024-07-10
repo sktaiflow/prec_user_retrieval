@@ -14,17 +14,20 @@ from airflow.models.baseoperator import chain
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python_operator import BranchPythonOperator, PythonOperator
+
+from airflow.sensors.base import BaseSensorOperator
+from airflow.utils.decorators import apply_defaults
+
+
 from airflow.providers.google.cloud.sensors.bigquery import (
     BigQueryTablePartitionExistenceSensor,
 )
 from airflow.models.variable import Variable
 
 from airflow.providers.sktvane.operators.nes import NesOperator
-from airflow.sensors.time_sensor import TimeSensor
-from airflow.sensors.hive_partition_sensor import HivePartitionSensor
-from airflow.sensors.web_hdfs_sensor import WebHdfsSensor
 from airflow.utils import timezone
 from airflow.utils.edgemodifier import Label
+from airflow.triggers.temporal import TimeDeltaTrigger
 
 local_tz = pendulum.timezone("Asia/Seoul")
 
@@ -43,19 +46,26 @@ common_process_notebook_path = "./common/preprocessing/notebook"
 log_process_path = f"{common_process_notebook_path}/log"
 meta_process_path = f"{common_process_notebook_path}/meta"
 
-from airflow.sensors.base import BaseSensorOperator
-from airflow.utils.decorators import apply_defaults
-
 class TimePassedSensor(BaseSensorOperator):
     @apply_defaults
-    def __init__(self, target_hour, *args, **kwargs):
-        super(TimePassedSensor, self).__init__(*args, **kwargs)
+    def __init__(self, target_hour, retry_delay=timedelta(hours=1), *args, **kwargs):
+        super(TimePassedSensor, self).__init__(mode='reschedule', *args, **kwargs)
         self.target_hour = target_hour
+        self.retry_delay = retry_delay
 
     def poke(self, context):
         current_time = datetime.now().time()
         target_time = time(hour=self.target_hour)
-        return current_time >= target_time
+        if current_time >= target_time:
+            return True
+        else:
+            self.log.info(f"Current time {current_time} is before target time {target_time}. Rescheduling...")
+            return False
+
+    def execute(self, context):
+        while not self.poke(context):
+            self.log.info(f"Task will retry after {self.retry_delay}.")
+            self.defer(trigger=TimeDeltaTrigger(self.retry_delay), method_name="execute")
 
 
 
