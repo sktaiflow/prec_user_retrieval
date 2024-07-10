@@ -72,7 +72,7 @@ with DAG(
     
 ) as dag: 
     
-    start = DummyOperator(task_id='start', dag=dag)
+    #start = DummyOperator(task_id='start', dag=dag)
     end_preprocess = DummyOperator(task_id='end_preprocess', dag=dag)
 
     time_sensor_10pm = TimePassedSensor(
