@@ -20,6 +20,7 @@ from airflow.providers.google.cloud.sensors.bigquery import (
 from airflow.models.variable import Variable
 
 from airflow.providers.sktvane.operators.nes import NesOperator
+from airflow.sensors.time_sensor import TimeSensor
 from airflow.sensors.hive_partition_sensor import HivePartitionSensor
 from airflow.sensors.web_hdfs_sensor import WebHdfsSensor
 from airflow.utils import timezone
@@ -47,7 +48,8 @@ with DAG(
     dag_id=f"CommonPreprocessProfiles_{env}",
     default_args=default_args,
     description="DAG with own plugins",
-    schedule="0 22 * * *",
+    #schedule="0 22 * * *",
+    schedule_interval='@daily',
     start_date=pendulum.datetime(2024, 7, 2, tz=local_tz),
     catchup=True,
     max_active_runs=1,
@@ -57,6 +59,17 @@ with DAG(
     
     start = DummyOperator(task_id='start', dag=dag)
     end_preprocess = DummyOperator(task_id='end_preprocess', dag=dag)
+
+    time_sensor_10pm = TimeSensor(
+        task_id='wait_until_10pm',
+        target_time=datetime.time(hour=22, minute=0),
+    )
+
+    time_sensor_3am = TimeSensor(
+    task_id='wait_until_3am',
+    target_time=datetime.time(hour=3, minute=0),
+    )
+
 
     xdr_cat1_cnt =  NesOperator(
         task_id="xdr_cat1_cnt",
@@ -105,14 +118,13 @@ with DAG(
         input_nb=f"{log_process_path}/p_tmbr_item.ipynb",
     )
 
-    # tmbr_meta_table = NesOperator(
-    #     task_id="tmbr_meta_table",
-    #     parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
-    #     input_nb=f"{meta_process_path}/p_tmbr_item_meta.ipynb",
-    # )
+    tmbr_meta_table = NesOperator(
+        task_id="tmbr_meta_table",
+        parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
+        input_nb=f"{meta_process_path}/p_tmbr_item_meta.ipynb",
+    )
 
     """DAG CHAIN"""
 
-    start >> [xdr_cat1_cnt, tmap_item_cnt, tmap_cat1_cnt, adot_cat1_cnt, adot_item_cnt, tdeal_cat1_cnt] >> end_preprocess
-    start  >> tmbr_item_cnt >> end_preprocess
-    #tmbr_meta_table
+    time_sensor_10pm >> [xdr_cat1_cnt, tmap_item_cnt, tmap_cat1_cnt, adot_cat1_cnt, adot_item_cnt, tdeal_cat1_cnt] >> end_preprocess
+    time_sensor_3am  >> tmbr_meta_table>> tmbr_item_cnt >> end_preprocess
