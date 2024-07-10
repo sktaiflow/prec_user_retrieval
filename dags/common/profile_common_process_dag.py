@@ -36,7 +36,7 @@ env = Variable.get("env", "stg")
 gcp_project_id = Variable.get("GCP_PROJECT_ID", "skt-datahub")
 default_args = {
     "retries": 10,
-    "depends_on_past": True
+    "depends_on_past": False
 }
 
 common_process_notebook_path = "./common/preprocessing/notebook"
