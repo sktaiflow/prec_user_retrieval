@@ -77,12 +77,12 @@ with DAG(
 
     time_sensor_10pm = TimePassedSensor(
         task_id='wait_until_10pm',
-        target_time=time(hour=22, minute=0),
+        target_time=time(target_hour=22)
     )
 
     time_sensor_3am = TimePassedSensor(
     task_id='wait_until_3am',
-    target_time=time(hour=3, minute=0),
+    target_time=time(target_hour=3)
     )
 
 
