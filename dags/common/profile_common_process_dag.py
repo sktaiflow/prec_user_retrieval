@@ -4,7 +4,7 @@
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from textwrap import dedent
 
 import pendulum
@@ -62,12 +62,12 @@ with DAG(
 
     time_sensor_10pm = TimeSensor(
         task_id='wait_until_10pm',
-        target_time=datetime.time(hour=22, minute=0),
+        target_time=time(hour=22, minute=0),
     )
 
     time_sensor_3am = TimeSensor(
     task_id='wait_until_3am',
-    target_time=datetime.time(hour=3, minute=0),
+    target_time=time(hour=3, minute=0),
     )
 
 
