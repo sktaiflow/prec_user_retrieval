@@ -112,11 +112,11 @@ with DAG(
         input_nb=f"{log_process_path}/p_adot_item.ipynb",
     )
 
-    tmbr_item_cnt = NesOperator(
-        task_id="tmbr_item_cnt",
-        parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
-        input_nb=f"{log_process_path}/p_tmbr_item.ipynb",
-    )
+    # tmbr_item_cnt = NesOperator(
+    #     task_id="tmbr_item_cnt",
+    #     parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
+    #     input_nb=f"{log_process_path}/p_tmbr_item.ipynb",
+    # )
 
     tmbr_meta_table = NesOperator(
         task_id="tmbr_meta_table",
@@ -127,4 +127,4 @@ with DAG(
     """DAG CHAIN"""
 
     time_sensor_10pm >> [xdr_cat1_cnt, tmap_item_cnt, tmap_cat1_cnt, adot_cat1_cnt, adot_item_cnt, tdeal_cat1_cnt] >> end_preprocess
-    time_sensor_3am  >> tmbr_meta_table>> tmbr_item_cnt >> end_preprocess
+    time_sensor_3am  >> tmbr_meta_table >> end_preprocess
