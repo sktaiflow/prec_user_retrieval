@@ -43,6 +43,21 @@ common_process_notebook_path = "./common/preprocessing/notebook"
 log_process_path = f"{common_process_notebook_path}/log"
 meta_process_path = f"{common_process_notebook_path}/meta"
 
+from airflow.sensors.base import BaseSensorOperator
+from airflow.utils.decorators import apply_defaults
+
+class TimePassedSensor(BaseSensorOperator):
+    @apply_defaults
+    def __init__(self, target_hour, *args, **kwargs):
+        super(TimePassedSensor, self).__init__(*args, **kwargs)
+        self.target_hour = target_hour
+
+    def poke(self, context):
+        current_time = datetime.now().time()
+        target_time = time(hour=self.target_hour)
+        return current_time >= target_time
+
+
 
 with DAG(
     dag_id=f"CommonPreprocessProfiles_{env}",
@@ -60,12 +75,12 @@ with DAG(
     start = DummyOperator(task_id='start', dag=dag)
     end_preprocess = DummyOperator(task_id='end_preprocess', dag=dag)
 
-    time_sensor_10pm = TimeSensor(
+    time_sensor_10pm = TimePassedSensor(
         task_id='wait_until_10pm',
         target_time=time(hour=22, minute=0),
     )
 
-    time_sensor_3am = TimeSensor(
+    time_sensor_3am = TimePassedSensor(
     task_id='wait_until_3am',
     target_time=time(hour=3, minute=0),
     )
