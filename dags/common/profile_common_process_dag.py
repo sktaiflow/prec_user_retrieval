@@ -126,5 +126,5 @@ with DAG(
 
     """DAG CHAIN"""
 
-    time_sensor_10pm >> [xdr_cat1_cnt, tmap_item_cnt, tmap_cat1_cnt, adot_cat1_cnt, adot_item_cnt, tdeal_cat1_cnt] >> end_preprocess
+    time_sensor_10pm >> [xdr_cat1_cnt, tmap_item_cnt, tmap_cat1_cnt, adot_cat1_cnt, adot_item_cnt, tdeal_cat1_cnt, st11_cat1_cnt] >> end_preprocess
     time_sensor_3am  >> tmbr_meta_table >> end_preprocess
