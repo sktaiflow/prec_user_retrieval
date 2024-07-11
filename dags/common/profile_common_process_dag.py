@@ -28,6 +28,7 @@ from airflow.providers.sktvane.operators.nes import NesOperator
 from airflow.utils import timezone
 from airflow.utils.edgemodifier import Label
 from airflow.triggers.temporal import TimeDeltaTrigger
+from airflow.providers.sktvane.macros.gcp import bigquery_client
 
 local_tz = pendulum.timezone("Asia/Seoul")
 
