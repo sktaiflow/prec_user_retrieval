@@ -50,10 +50,9 @@ meta_process_path = f"{common_process_notebook_path}/meta"
 
 class TimePassedSensor(BaseSensorOperator):
     @apply_defaults
-    def __init__(self, target_hour, retry_delay=timedelta(hours=1), *args, **kwargs):
-        super(TimePassedSensor, self).__init__(mode='reschedule', *args, **kwargs)
+    def __init__(self, target_hour, *args, **kwargs):
+        super(TimePassedSensor, self).__init__(*args, **kwargs)
         self.target_hour = target_hour
-        self.retry_delay = retry_delay
 
     def poke(self, context):
         current_time = datetime.now().time()
@@ -61,14 +60,8 @@ class TimePassedSensor(BaseSensorOperator):
         if current_time >= target_time:
             return True
         else:
-            self.log.info(f"Current time {current_time} is before target time {target_time}. Rescheduling...")
+            self.log.info(f"Current time {current_time} is before target time {target_time}. Waiting...")
             return False
-
-    def execute(self, context):
-        while not self.poke(context):
-            self.log.info(f"Task will retry after {self.retry_delay}.")
-            self.defer(trigger=TimeDeltaTrigger(self.retry_delay), method_name="execute")
-
 
 
 with DAG(
@@ -90,11 +83,17 @@ with DAG(
     time_sensor_10pm = TimePassedSensor(
         task_id='wait_until_10pm',
         target_hour=22
+        poke_interval=3600,
+        timeout=86400,
+        mode='poke'
     )
 
     time_sensor_3am = TimePassedSensor(
     task_id='wait_until_3am',
-    target_hour=3
+    target_hour=3,
+    poke_interval=3600,
+    timeout=86400,
+    mode='poke'
     )
 
 
