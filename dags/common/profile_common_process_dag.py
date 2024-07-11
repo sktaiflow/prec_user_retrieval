@@ -82,7 +82,7 @@ with DAG(
 
     time_sensor_10pm = TimePassedSensor(
         task_id='wait_until_10pm',
-        target_hour=22
+        target_hour=22,
         poke_interval=3600,
         timeout=86400,
         mode='poke'
