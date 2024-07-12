@@ -13,25 +13,11 @@ from airflow.decorators import dag, task
 from airflow.models.baseoperator import chain
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy import DummyOperator
-from airflow.operators.python_operator import BranchPythonOperator, PythonOperator
 
-from airflow.sensors.base import BaseSensorOperator
-from airflow.utils.decorators import apply_defaults
-
-from airflow.providers.google.cloud.operators.bigquery import (
-    BigQueryCreateEmptyTableOperator,
-    BigQueryInsertJobOperator,
-)
-from airflow.providers.google.cloud.sensors.bigquery import (
-    BigQueryTablePartitionExistenceSensor,
-)
 from airflow.models.variable import Variable
 
 from airflow.providers.sktvane.operators.nes import NesOperator
 from airflow.utils import timezone
-from airflow.utils.edgemodifier import Label
-from airflow.triggers.temporal import TimeDeltaTrigger
-from airflow.providers.sktvane.macros.gcp import bigquery_client
 
 local_tz = pendulum.timezone("Asia/Seoul")
 conn_id = 'slack_conn'
