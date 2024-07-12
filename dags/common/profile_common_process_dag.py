@@ -57,7 +57,7 @@ with DAG(
     description="DAG with own plugins",
     schedule="0 22 * * *",
     #schedule_interval='@daily',
-    start_date=pendulum.datetime(2024, 7, 2, tz=local_tz),
+    start_date=pendulum.datetime(2024, 7, 10, tz=local_tz),
     catchup=True,
     max_active_runs=1,
     tags=["CommonPreprocessProfiles"],
