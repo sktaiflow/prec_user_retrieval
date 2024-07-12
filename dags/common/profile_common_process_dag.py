@@ -18,7 +18,10 @@ from airflow.operators.python_operator import BranchPythonOperator, PythonOperat
 from airflow.sensors.base import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
 
-
+from airflow.providers.google.cloud.operators.bigquery import (
+    BigQueryCreateEmptyTableOperator,
+    BigQueryInsertJobOperator,
+)
 from airflow.providers.google.cloud.sensors.bigquery import (
     BigQueryTablePartitionExistenceSensor,
 )
@@ -31,13 +34,26 @@ from airflow.triggers.temporal import TimeDeltaTrigger
 from airflow.providers.sktvane.macros.gcp import bigquery_client
 
 local_tz = pendulum.timezone("Asia/Seoul")
-
-### 
 conn_id = 'slack_conn'
-
 env = Variable.get("env", "stg")
 
-gcp_project_id = Variable.get("GCP_PROJECT_ID", "skt-datahub")
+
+# class TimePassedSensor(BaseSensorOperator):
+#     @apply_defaults
+#     def __init__(self, target_hour, *args, **kwargs):
+#         super(TimePassedSensor, self).__init__(*args, **kwargs)
+#         self.target_hour = target_hour
+
+#     def poke(self, context):
+#         current_time = datetime.now().time()
+#         target_time = time(hour=self.target_hour)
+#         if current_time >= target_time:
+#             return True
+#         else:
+#             self.log.info(f"Current time {current_time} is before target time {target_time}. Waiting...")
+#             return False
+
+
 default_args = {
     "retries": 24,
     "depends_on_past": True,
@@ -48,28 +64,13 @@ common_process_notebook_path = "./common/preprocessing/notebook"
 log_process_path = f"{common_process_notebook_path}/log"
 meta_process_path = f"{common_process_notebook_path}/meta"
 
-class TimePassedSensor(BaseSensorOperator):
-    @apply_defaults
-    def __init__(self, target_hour, *args, **kwargs):
-        super(TimePassedSensor, self).__init__(*args, **kwargs)
-        self.target_hour = target_hour
-
-    def poke(self, context):
-        current_time = datetime.now().time()
-        target_time = time(hour=self.target_hour)
-        if current_time >= target_time:
-            return True
-        else:
-            self.log.info(f"Current time {current_time} is before target time {target_time}. Waiting...")
-            return False
-
 
 with DAG(
-    dag_id=f"CommonPreprocessProfiles_{env}",
+    dag_id=f"CommonPreprocessProfile_{env}",
     default_args=default_args,
     description="DAG with own plugins",
-    #schedule="0 22 * * *",
-    schedule_interval='@daily',
+    schedule="0 22 * * *",
+    #schedule_interval='@daily',
     start_date=pendulum.datetime(2024, 7, 2, tz=local_tz),
     catchup=True,
     max_active_runs=1,
@@ -77,25 +78,16 @@ with DAG(
     
 ) as dag: 
     
-    #start = DummyOperator(task_id='start', dag=dag)
-    end_preprocess = DummyOperator(task_id='end_preprocess', dag=dag)
+    end = DummyOperator(task_id='end')
+    start = DummyOperator(task_id='start')
 
-    time_sensor_10pm = TimePassedSensor(
-        task_id='wait_until_10pm',
-        target_hour=22,
-        poke_interval=3600,
-        timeout=86400,
-        mode='poke'
-    )
-
-    time_sensor_3am = TimePassedSensor(
-    task_id='wait_until_3am',
-    target_hour=3,
-    poke_interval=3600,
-    timeout=86400,
-    mode='poke'
-    )
-
+    # time_sensor_10pm = TimePassedSensor(
+    #     task_id='wait_until_10pm',
+    #     target_hour=22,
+    #     poke_interval=3600,
+    #     timeout=86400,
+    #     mode='poke'
+    # )
 
     xdr_cat1_cnt =  NesOperator(
         task_id="xdr_cat1_cnt",
@@ -144,13 +136,6 @@ with DAG(
     #     input_nb=f"{log_process_path}/p_tmbr_item.ipynb",
     # )
 
-    tmbr_meta_table = NesOperator(
-        task_id="tmbr_meta_table",
-        parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
-        input_nb=f"{meta_process_path}/p_tmbr_item_meta.ipynb",
-    )
-
     """DAG CHAIN"""
 
-    time_sensor_10pm >> [xdr_cat1_cnt, tmap_item_cnt, tmap_cat1_cnt, adot_cat1_cnt, adot_item_cnt, tdeal_cat1_cnt, st11_cat1_cnt] >> end_preprocess
-    time_sensor_3am  >> tmbr_meta_table >> end_preprocess
+    start >> [xdr_cat1_cnt, tmap_item_cnt, tmap_cat1_cnt, adot_cat1_cnt, adot_item_cnt, tdeal_cat1_cnt, st11_cat1_cnt] >> end
