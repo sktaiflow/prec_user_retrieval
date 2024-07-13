@@ -128,7 +128,6 @@ with DAG(
             {"name": "brand_name", "type": "STRING"},
             {"name": "meidum_categories", "type": "STRING"},
             {"name": "small_categories", "type": "STRING"},
-            {"name": "description", "type": "STRING"},
             {"name": "dt", "type": "DATE"},
         ],
         time_partitioning={
