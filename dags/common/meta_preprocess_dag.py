@@ -86,31 +86,85 @@ with DAG(
     start = DummyOperator(task_id="start")
     end = DummyOperator(task_id='end')
 
-    create_table = BigQueryCreateEmptyTableOperator(
-        task_id="create_table",
+    create_tmbr_etymology_table = BigQueryCreateEmptyTableOperator(
+        task_id="create_tmbr_etymology_table",
         dataset_id=db_name,
-        table_id="tmbr_meta_mapping_tbl",
+        table_id="tmbr_etymology_table",
         schema_fields=[
-            {"name": "brand_id", "type": "STRING"},
             {"name": "brand_name", "type": "STRING"},
-            {"name": "categories", "type": "STRING"},
-            {"name": "brand_name_model", "type": "STRING"},
-            {"name": "updated_at", "type": "STRING"},
-            {"name": "created_at", "type": "STRING"},
-            {"name": "profile_list", "type": "STRING"},
+            {"name": "description", "type": "STRING"},
+            {"name": "derivative_brand", "type": "STRING"},
             {"name": "dt", "type": "DATE"},
         ],
         time_partitioning={
             "field": "dt",
             "type": "DAY",
-            "expirationMs": 30 * 24 * 60 * 60 * 1000,
         },
         exists_ok=True,
     )
-    check_meta_update_branch = BranchPythonOperator(
-        task_id='check_meta_update_branch',
-        python_callable=check_meta_update
+    create_basic_category_table = BigQueryCreateEmptyTableOperator(
+        task_id="create_basic_category_table",
+        dataset_id=db_name,
+        table_id="tmbr_basic_category_mapping_table",
+        schema_fields=[
+            {"name": "brand_name", "type": "STRING"},
+            {"name": "category_large_name", "type": "STRING"},
+            {"name": "category_medium_name", "type": "STRING"},
+            {"name": "category_small_name", "type": "STRING"},
+            {"name": "description", "type": "STRING"},
+            {"name": "dt", "type": "DATE"},
+        ],
+        time_partitioning={
+            "field": "dt",
+            "type": "DAY",
+        },
+        exists_ok=True,
     )
+    create_final_category_table = BigQueryCreateEmptyTableOperator(
+        task_id="create_final_category_table",
+        dataset_id=db_name,
+        table_id="tmbr_final_category_mapping_table",
+        schema_fields=[
+            {"name": "brand_name", "type": "STRING"},
+            {"name": "meidum_categories", "type": "STRING"},
+            {"name": "small_categories", "type": "STRING"},
+            {"name": "description", "type": "STRING"},
+            {"name": "dt", "type": "DATE"},
+        ],
+        time_partitioning={
+            "field": "dt",
+            "type": "DAY",
+        },
+        exists_ok=True,
+    )
+
+    create_tmbr_meta_active_table = BigQueryCreateEmptyTableOperator(
+        task_id="create_tmbr_meta_active_table",
+        dataset_id=db_name,
+        table_id="tmbr_meta_active_tbl",
+        schema_fields=[
+            {"name": "brand_id", "type": "STRING"},
+            {"name": "brand_name", "type": "STRING"},
+            {"name": "meidum_categories", "type": "STRING"},
+            {"name": "small_categories", "type": "STRING"},
+            {"name": "brand_name_model", "type": "STRING"},
+            {"name": "updated_at", "type": "STRING"},
+            {"name": "created_at", "type": "STRING"},
+            {"name": "del_yn", "type": "STRING"},
+            {"name": "brand_status_type", "type": "STRING"},
+            {"name": "dt", "type": "DATE"},
+        ],
+        time_partitioning={
+            "field": "dt",
+            "type": "DAY",
+        },
+        exists_ok=True,
+    )
+    
+    # check_meta_update_branch = BranchPythonOperator(
+    #     task_id='check_meta_update_branch',
+    #     python_callable=check_meta_update
+    # )
     
     tmbr_meta_table = NesOperator(
         task_id="tmbr_meta_table",
@@ -120,5 +174,5 @@ with DAG(
 
     """DAG CHAIN"""
 
-    start >> create_table >> check_meta_update_branch >> [end, tmbr_meta_table]
-    tmbr_meta_table >> end
+    #start >> [create_tmbr_etymology_table, create_tmbr_meta_table] >> check_meta_update_branch >> [end, tmbr_meta_table]
+    start >> [create_tmbr_etymology_table, create_basic_category_table, create_final_category_table, create_tmbr_meta_active_table] >> tmbr_meta_table >> end
