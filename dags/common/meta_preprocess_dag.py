@@ -161,10 +161,10 @@ with DAG(
         exists_ok=True,
     )
 
-    check_meta_update_branch = BranchPythonOperator(
-        task_id='check_meta_update_branch',
-        python_callable=check_meta_update
-    )
+    # check_meta_update_branch = BranchPythonOperator(
+    #     task_id='check_meta_update_branch',
+    #     python_callable=check_meta_update
+    # )
     
     tmbr_meta_table = NesOperator(
         task_id="tmbr_meta_table",
@@ -174,6 +174,6 @@ with DAG(
 
     """DAG CHAIN"""
 
-    start >> [create_tmbr_etymology_table, create_basic_category_table, create_final_category_table, create_tmbr_meta_active_table] >> check_meta_update_branch >> [end, tmbr_meta_table]
-    tmbr_meta_table >> end
-    #start >> [create_tmbr_etymology_table, create_basic_category_table, create_final_category_table, create_tmbr_meta_active_table] >> tmbr_meta_table >> end
+    #start >> [create_tmbr_etymology_table, create_basic_category_table, create_final_category_table, create_tmbr_meta_active_table] >> check_meta_update_branch >> [end, tmbr_meta_table]
+    #tmbr_meta_table >> end
+    start >> [create_tmbr_etymology_table, create_basic_category_table, create_final_category_table, create_tmbr_meta_active_table] >> tmbr_meta_table >> end
