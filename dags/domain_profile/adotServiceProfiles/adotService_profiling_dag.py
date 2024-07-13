@@ -100,7 +100,7 @@ with DAG(
     nudge_offering_table =  NesOperator(
         task_id="nudge_offering_table",
         parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60", "nudge_token": nudge_api_token},
-        input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_adot.ipynb",
+        input_nb="./domain_profile/adotServiceProfiles/notebook/nudge_offering_table.ipynb",
     )
 
     profilePivotTable =  NesOperator(
