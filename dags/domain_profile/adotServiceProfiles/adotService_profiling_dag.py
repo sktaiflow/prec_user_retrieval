@@ -49,7 +49,7 @@ with DAG(
     default_args=default_args,
     description="DAG with own plugins",
     schedule="0 22 * * *",
-    start_date=pendulum.datetime(2024, 6, 22, tz=local_tz),
+    start_date=pendulum.datetime(2024, 7, 11, tz=local_tz),
     catchup=True,
     max_active_runs=1,
     tags=["adotServiceProfiles"],
