@@ -62,7 +62,7 @@ with DAG(
     default_args=default_args,
     description="DAG with own plugins",
     schedule="0 18 * * *",
-    start_date=pendulum.datetime(2024, 7, 2, tz=local_tz),
+    start_date=pendulum.datetime(2024, 7, 11, tz=local_tz),
     catchup=True,
     max_active_runs=1,
     tags=["CommonMetaPreprocess"],
@@ -160,7 +160,7 @@ with DAG(
         },
         exists_ok=True,
     )
-    
+
     # check_meta_update_branch = BranchPythonOperator(
     #     task_id='check_meta_update_branch',
     #     python_callable=check_meta_update
