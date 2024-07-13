@@ -97,20 +97,20 @@ with DAG(
         input_nb="./domain_profile/adotServiceProfiles/notebook/profiling_xdr_weekend.ipynb",
     )
 
-    nudge_offering_table =  NesOperator(
-        task_id="nudge_offering_table",
-        parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60", "nudge_token": nudge_api_token},
-        input_nb="./domain_profile/adotServiceProfiles/notebook/nudge_offering_table.ipynb",
-    )
+    # nudge_offering_table =  NesOperator(
+    #     task_id="nudge_offering_table",
+    #     parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60", "nudge_token": nudge_api_token},
+    #     input_nb="./domain_profile/adotServiceProfiles/notebook/nudge_offering_table.ipynb",
+    # )
 
-    profilePivotTable =  NesOperator(
-        task_id="profilePivotTable",
-        parameters={"current_dt": "{{ ds }}", "state": env},
-        input_nb="./domain_profile/adotServiceProfiles/notebook/pivoting_profile.ipynb",
-    )
+    # profilePivotTable =  NesOperator(
+    #     task_id="profilePivotTable",
+    #     parameters={"current_dt": "{{ ds }}", "state": env},
+    #     input_nb="./domain_profile/adotServiceProfiles/notebook/pivoting_profile.ipynb",
+    # )
 
 
-    start >> nudge_offering_table >> end_profiling
-    start >> [profile_adot, profile_tdeal, profile_tmap, profile_xdr, profile_xdr_weekend, profile_adot_weekend] >> profilePivotTable >> end_profiling
+    #start >> nudge_offering_table >> end_profiling
+    start >> [profile_adot, profile_tdeal, profile_tmap, profile_xdr, profile_xdr_weekend, profile_adot_weekend] >> end_profiling
 
     
