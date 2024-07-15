@@ -41,7 +41,7 @@ local_tz = pendulum.timezone("Asia/Seoul")
 conn_id = 'slack_conn'
 env = Variable.get("env", "stg")
 project_id = Variable.get("GCP_PROJECT_ID", "skt-datahub")
-db_name = "adot_reco_dev"
+db_name = "adot_reco"
 
 
 
