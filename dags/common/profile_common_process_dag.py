@@ -57,7 +57,7 @@ with DAG(
     description="DAG with own plugins",
     schedule="0 22 * * *",
     #schedule_interval='@daily',
-    start_date=pendulum.datetime(2024, 7, 10, tz=local_tz),
+    start_date=pendulum.datetime(2024, 7, 15, tz=local_tz),
     catchup=True,
     max_active_runs=1,
     tags=["CommonPreprocessProfiles"],
@@ -116,12 +116,12 @@ with DAG(
         input_nb=f"{log_process_path}/p_adot_item.ipynb",
     )
 
-    # tmbr_item_cnt = NesOperator(
-    #     task_id="tmbr_item_cnt",
-    #     parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
-    #     input_nb=f"{log_process_path}/p_tmbr_item.ipynb",
-    # )
+    tmbr_cat1_cnt = NesOperator(
+        task_id="tmbr_cat1_cnt",
+        parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
+        input_nb=f"{log_process_path}/p_tmbr_cat1.ipynb",
+    )
 
     """DAG CHAIN"""
 
-    start >> [xdr_cat1_cnt, tmap_item_cnt, tmap_cat1_cnt, adot_cat1_cnt, adot_item_cnt, tdeal_cat1_cnt, st11_cat1_cnt] >> end
+    start >> [xdr_cat1_cnt, tmap_item_cnt, tmap_cat1_cnt, adot_cat1_cnt, adot_item_cnt, tdeal_cat1_cnt, st11_cat1_cnt, tmbr_cat1_cnt] >> end
