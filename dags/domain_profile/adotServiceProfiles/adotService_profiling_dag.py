@@ -60,7 +60,7 @@ CallbackNotifier.SELECTED_TASK_IDS = ALARMING_TASK_IDS
 
 default_args = {
     "retries": 24,
-    "depends_on_past": True,
+    "depends_on_past": False,
     "retry_delay": timedelta(hours=1),
     "on_success_callback": CallbackNotifier.on_success_callback,
     "on_failure_callback": CallbackNotifier.on_failure_callback,
@@ -73,7 +73,7 @@ with DAG(
     description="DAG with own plugins",
     schedule="0 22 * * *",
     start_date=pendulum.datetime(2024, 7, 11, tz=local_tz),
-    catchup=True,
+    catchup=False,
     max_active_runs=1,
     tags=["adotServiceProfiles"],
 ) as dag:
