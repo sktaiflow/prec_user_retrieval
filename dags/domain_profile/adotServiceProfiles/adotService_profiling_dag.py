@@ -81,58 +81,113 @@ with DAG(
     dag.doc_md = """User Profile && model Profile 만드는 DAG"""
 
     start = DummyOperator(task_id="start", dag=dag)
-    end_profiling = DummyOperator(task_id="end_profiling", dag=dag)
+    end = DummyOperator(task_id="end", dag=dag)
 
-    profile_adot = NesOperator(
+    profile_adot = create_nes_task(
+        dag=dag,
         task_id="profile_adot",
+        notebook_path=notebook_path,
+        notebook_name="profiling_adot.ipynb",
         parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60"},
-        input_nb=f"{notebook_path}/profiling_adot.ipynb",
+        doc_md={
+            "task_description": "adot log를 이용한 User & model profile 생성",
+            "output_tables": "adotServiceProfile_adot, adotServiceProfile_templated_adot",
+            "reference_tables": "adot_reco_dev.adot_cat1_cnt",
+        },
     )
 
-    profile_adot_weekend = NesOperator(
+    profile_adot_weekend = create_nes_task(
+        dag=dag,
         task_id="profile_adot_weekend",
+        notebook_path=notebook_path,
+        notebook_name="profiling_adot_weekend.ipynb",
         parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60"},
-        input_nb=f"{notebook_path}/profiling_adot_weekend.ipynb",
+        doc_md={
+            "task_description": "adot 주말 log를 이용한 User Profile만 생성 (주말 로그만 사용)",
+            "output_tables": "adotServiceProfile_adot_weekend, adotServiceProfile_templated_adot_weekend",
+            "reference_tables": "adot_reco_dev.adot_cat1_cnt",
+        },
     )
 
-    profile_tdeal = NesOperator(
+    profile_tdeal = create_nes_task(
+        dag=dag,
         task_id="profile_tdeal",
+        notebook_path=notebook_path,
+        notebook_name="profiling_tdeal.ipynb",
         parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60"},
-        input_nb=f"{notebook_path}/profiling_tdeal.ipynb",
+        doc_md={
+            "task_description": "tdeal log를 이용한 User & model profile 생성",
+            "output_tables": "adotServiceProfile_tdeal, adotServiceProfile_templated_tdeal, adotServiceProfile_templated_tdeal_model",
+            "reference_tables": "adot_reco_dev.tdeal_cat1_cnt",
+        },
     )
 
-    profile_tmap = NesOperator(
+    profile_tmap = create_nes_task(
+        dag=dag,
         task_id="profile_tmap",
+        notebook_path=notebook_path,
+        notebook_name="profiling_tmap.ipynb",
         parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60"},
-        input_nb=f"{notebook_path}/profiling_tmap.ipynb",
+        doc_md={
+            "task_description": "tmap log를 이용한 User & model profile 생성",
+            "output_tables": "adotServiceProfile_tmap, adotServiceProfile_templated_tmap, adotServiceProfile_templated_tmap_model",
+            "reference_tables": "adot_reco_dev.tmap_item_cnt",
+        },
     )
-    profile_xdr = NesOperator(
+
+    profile_xdr = create_nes_task(
+        dag=dag,
         task_id="profile_xdr",
+        notebook_path=notebook_path,
+        notebook_name="profiling_xdr.ipynb",
         parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "30"},
-        input_nb=f"{notebook_path}/profiling_xdr.ipynb",
+        doc_md={
+            "task_description": "xdr log를 이용한 User & model profile 생성",
+            "output_tables": "adotServiceProfile_xdr, adotServiceProfile_templated_xdr",
+            "reference_tables": "adot_reco_dev.xdr_cat1_cnt",
+        },
     )
 
-    profile_xdr_weekend = NesOperator(
+    profile_xdr_weekend = create_nes_task(
+        dag=dag,
         task_id="profile_xdr_weekend",
+        notebook_path=notebook_path,
+        notebook_name="profiling_xdr_weekend.ipynb",
         parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60"},
-        input_nb=f"{notebook_path}/profiling_xdr_weekend.ipynb",
+        doc_md={
+            "task_description": "xdr 주말 log를 이용한 User profile 생성 (is_weekend=1)",
+            "output_tables": "adotServiceProfile_xdr_weekend, adotServiceProfile_templated_xdr_weekend",
+            "reference_tables": "adot_reco_dev.xdr_cat1_cnt",
+        },
     )
-
-    profile_tmbr = NesOperator(
+    profile_tmbr = create_nes_task(
+        dag=dag,
         task_id="profile_tmbr",
+        notebook_path=notebook_path,
+        notebook_name="profiling_tmbr.ipynb",
         parameters={"current_dt": "{{ ds }}", "state": env, "log_duration": "60"},
-        input_nb=f"{notebook_path}/profiling_tmbr.ipynb",
+        doc_md={
+            "task_description": "tmbr log를 이용한 User profile 생성",
+            "output_tables": "adotServiceProfile_tmbr, adotServiceProfile_templated_tmbr",
+            "reference_tables": "adot_reco_dev.tmbr_cat1_cnt",
+        },
     )
 
-    nudge_offering_table = NesOperator(
+    nudge_offering_table = create_nes_task(
+        dag=dag,
         task_id="nudge_offering_table",
+        notebook_path=notebook_path,
+        notebook_name="nudge_offering_table.ipynb",
         parameters={
             "current_dt": "{{ ds }}",
             "state": env,
-            "log_duration": "60",
             "nudge_token": nudge_api_token,
         },
-        input_nb=f"{notebook_path}/nudge_offering_table.ipynb",
+        doc_md={
+            "task_description": "nudge offering api 호출 후 값 저장",
+            "output_tables": "nudge_offering_api_table",
+            "reference_tables": "",
+        },
     )
 
     # profilePivotTable =  NesOperator(
@@ -141,7 +196,7 @@ with DAG(
     #     input_nb="./domain_profile/adotServiceProfiles/notebook/pivoting_profile.ipynb",
     # )
 
-    start >> nudge_offering_table >> end_profiling
+    start >> nudge_offering_table >> end
     (
         start
         >> [
@@ -153,5 +208,5 @@ with DAG(
             profile_xdr_weekend,
             profile_adot_weekend,
         ]
-        >> end_profiling
+        >> end
     )
