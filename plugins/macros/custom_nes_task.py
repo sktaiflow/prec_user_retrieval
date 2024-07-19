@@ -10,7 +10,7 @@ def create_nes_task(
     notebook_path: str,
     notebook_name: str = None,
     parameters: Dict = None,
-    doc_md_template: str = "",
+    doc_md_template: str = "task_description:{task_description} || output_tables:{output_tables} || reference_tables: {reference_tables}",
     doc_md: Dict = {},
 ) -> NesOperator:
     """
