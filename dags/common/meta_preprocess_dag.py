@@ -65,6 +65,9 @@ default_args = {
     "retries": 24,
     "depends_on_past": True,
     "retry_delay": timedelta(hours=1),
+    "on_success_callback": CallbackNotifier.on_success_callback,
+    "on_failure_callback": CallbackNotifier.on_failure_callback,
+    "on_retry_callback": CallbackNotifier.on_retry_callback,
 }
 
 with DAG(
