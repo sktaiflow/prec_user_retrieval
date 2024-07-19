@@ -1,8 +1,3 @@
-"""
-### DAG Documentation
-이 DAG는 HivePartitionSensor를 사용하는 예제입니다.
-"""
-
 from __future__ import annotations
 
 from datetime import datetime, timedelta, time
