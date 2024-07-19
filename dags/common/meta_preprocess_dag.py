@@ -86,6 +86,8 @@ with DAG(
     tags=["CommonMetaPreprocess"],
 ) as dag:
 
+    dag.doc_md = """META 만드는 DAG"""
+
     def check_meta_update(**kwargs):
         hook = BigQueryHook(bigquery_conn_id="bigquery_default", use_legacy_sql=False)
         sql = f"""
