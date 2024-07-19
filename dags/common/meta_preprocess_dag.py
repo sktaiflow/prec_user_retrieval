@@ -48,7 +48,6 @@ CallbackNotifier.SLACK_CONN_ID = conn_id
 ## add Custom Variables
 
 common_process_notebook_path = "./common/preprocessing/notebook"
-log_process_path = f"{common_process_notebook_path}/log"
 meta_process_path = f"{common_process_notebook_path}/meta"
 tmbr_meta_original_table = "mp_taxonomies_brand"
 
