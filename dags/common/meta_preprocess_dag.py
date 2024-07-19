@@ -2,6 +2,7 @@
 ### DAG Documentation
 이 DAG는 HivePartitionSensor를 사용하는 예제입니다.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timedelta, time
@@ -21,7 +22,7 @@ from airflow.utils.decorators import apply_defaults
 from airflow.providers.google.cloud.operators.bigquery import (
     BigQueryCreateEmptyTableOperator,
     BigQueryInsertJobOperator,
-    BigQueryCheckOperator
+    BigQueryCheckOperator,
 )
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 
@@ -36,26 +37,43 @@ from airflow.utils.edgemodifier import Label
 from airflow.triggers.temporal import TimeDeltaTrigger
 from airflow.providers.sktvane.macros.gcp import bigquery_client
 
+from macros.custom_slack import CallbackNotifier, SlackBot
+from macros.custom_nes_task import create_nes_task
+
+
 ### AIRFLOW VARIABLE ###
 local_tz = pendulum.timezone("Asia/Seoul")
-conn_id = 'slack_conn'
+conn_id = "slack_conn"
 env = Variable.get("env", "stg")
 project_id = Variable.get("GCP_PROJECT_ID", "skt-datahub")
 db_name = "adot_reco"
+slack_conn_id = "slack_conn"
+CallbackNotifier.SLACK_CONN_ID = conn_id
 
+doc_md_template = "task_description:{task_description} || output_tables:{output_tables} || reference_tables: {reference_tables}"
 
-
-default_args = {
-    "retries": 24,
-    "depends_on_past": True,
-    'retry_delay': timedelta(hours=1),
-}
+## add Custom Variables
 
 common_process_notebook_path = "./common/preprocessing/notebook"
 log_process_path = f"{common_process_notebook_path}/log"
 meta_process_path = f"{common_process_notebook_path}/meta"
 tmbr_meta_original_table = "mp_taxonomies_brand"
 
+## add slack alarming task
+ALARMING_TASK_IDS = [
+    "create_tmbr_etymology_table",
+    "create_basic_category_table",
+    "create_final_category_table",
+    "create_tmbr_meta_active_table",
+    "tmbr_meta_table",
+]
+CallbackNotifier.SELECTED_TASK_IDS = ALARMING_TASK_IDS
+
+default_args = {
+    "retries": 24,
+    "depends_on_past": True,
+    "retry_delay": timedelta(hours=1),
+}
 
 with DAG(
     dag_id=f"CommonMetaPreprocess_{env}",
@@ -66,12 +84,11 @@ with DAG(
     catchup=True,
     max_active_runs=1,
     tags=["CommonMetaPreprocess"],
-    
-) as dag: 
+) as dag:
 
     def check_meta_update(**kwargs):
-        hook = BigQueryHook(bigquery_conn_id='bigquery_default', use_legacy_sql=False)
-        sql=f"""
+        hook = BigQueryHook(bigquery_conn_id="bigquery_default", use_legacy_sql=False)
+        sql = f"""
             SELECT COUNT(*) as count
             FROM {project_id}.{db_name}.{tmbr_meta_original_table}
             WHERE updated_at > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 DAY) OR created_at > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 DAY)
@@ -79,12 +96,12 @@ with DAG(
         """
         result = hook.get_first(sql)
         if result and result[0] > 0:
-            return 'tmbr_meta_table'
+            return "tmbr_meta_table"
         else:
-            return 'end'
+            return "end"
 
     start = DummyOperator(task_id="start")
-    end = DummyOperator(task_id='end')
+    end = DummyOperator(task_id="end")
 
     create_tmbr_etymology_table = BigQueryCreateEmptyTableOperator(
         task_id="create_tmbr_etymology_table",
@@ -161,19 +178,28 @@ with DAG(
         exists_ok=True,
     )
 
-    # check_meta_update_branch = BranchPythonOperator(
-    #     task_id='check_meta_update_branch',
-    #     python_callable=check_meta_update
-    # )
-    
-    tmbr_meta_table = NesOperator(
+    tmbr_meta_table = create_nes_task(
+        dag=dag,
         task_id="tmbr_meta_table",
-        parameters={"current_dt": "{{ ds }}", "state": env, "ttl": "60"},
-        input_nb=f"{meta_process_path}/p_tmbr_item_meta.ipynb",
+        notebook_path=meta_process_path,
+        notebook_name="p_tmbr_item_meta.ipynb",
+        parameters={"current_dt": "{{ ds }}", "state": env, "ttl": 60},
+        doc_md={
+            "task_description": "tmbr 메타 테이블 만드는 테스크",
+            "output_tables": "tmbr_meta_mapping_tbl, tmbr_meta_active_tbl, tmbr_final_category_mapping_table",
+            "reference_tables": "tmbr_operation_tbl, comm.mp_taxonomies_brand, ",
+        },
     )
 
     """DAG CHAIN"""
-
-    #start >> [create_tmbr_etymology_table, create_basic_category_table, create_final_category_table, create_tmbr_meta_active_table] >> check_meta_update_branch >> [end, tmbr_meta_table]
-    #tmbr_meta_table >> end
-    start >> [create_tmbr_etymology_table, create_basic_category_table, create_final_category_table, create_tmbr_meta_active_table] >> tmbr_meta_table >> end
+    (
+        start
+        >> [
+            create_tmbr_etymology_table,
+            create_basic_category_table,
+            create_final_category_table,
+            create_tmbr_meta_active_table,
+        ]
+        >> tmbr_meta_table
+        >> end
+    )
