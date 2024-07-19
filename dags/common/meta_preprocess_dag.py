@@ -50,8 +50,6 @@ db_name = "adot_reco"
 slack_conn_id = "slack_conn"
 CallbackNotifier.SLACK_CONN_ID = conn_id
 
-doc_md_template = "task_description:{task_description} || output_tables:{output_tables} || reference_tables: {reference_tables}"
-
 ## add Custom Variables
 
 common_process_notebook_path = "./common/preprocessing/notebook"
