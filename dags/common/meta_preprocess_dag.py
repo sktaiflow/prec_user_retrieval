@@ -53,11 +53,13 @@ tmbr_meta_original_table = "mp_taxonomies_brand"
 
 ## add slack alarming task
 ALARMING_TASK_IDS = [
+    "start",
     "create_tmbr_etymology_table",
     "create_basic_category_table",
     "create_final_category_table",
     "create_tmbr_meta_active_table",
     "tmbr_meta_table",
+    "end",
 ]
 CallbackNotifier.SELECTED_TASK_IDS = ALARMING_TASK_IDS
 
