@@ -38,12 +38,11 @@ from macros.custom_nes_task import create_nes_task
 
 ### AIRFLOW VARIABLE ###
 local_tz = pendulum.timezone("Asia/Seoul")
-conn_id = "slack_conn"
 env = Variable.get("env", "stg")
 project_id = Variable.get("GCP_PROJECT_ID", "skt-datahub")
 db_name = "adot_reco"
 slack_conn_id = "slack_conn"
-CallbackNotifier.SLACK_CONN_ID = conn_id
+CallbackNotifier.SLACK_CONN_ID = slack_conn_id
 
 ## add Custom Variables
 common_process_notebook_path = "./common/preprocessing/notebook"
