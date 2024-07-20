@@ -200,7 +200,7 @@ with DAG(
         schema_fields=[
             {"name": "profile_templates", "type": "STRING"},
             {"name": "source_domain", "type": "STRING"},
-            {"name": "profile_id", "type": "STRING"},
+            {"name": "profile_id", "type": "INTEGER"},
             {"name": "dt", "type": "DATE"},
         ],
         time_partitioning={
