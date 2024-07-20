@@ -25,6 +25,8 @@ from airflow.sensors.web_hdfs_sensor import WebHdfsSensor
 from airflow.utils import timezone
 from airflow.utils.edgemodifier import Label
 
+from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmptyTableOperator
+
 
 from macros.custom_slack import CallbackNotifier, SlackBot
 from macros.custom_nes_task import create_nes_task
@@ -42,6 +44,7 @@ CallbackNotifier.SLACK_CONN_ID = slack_conn_id
 
 ## add Custom Variables
 notebook_path = f"./domain_profile/adotServiceProfiles/notebook"
+db_name = "adot_reco_dev"
 
 ## add slack alarming task
 ALARMING_TASK_IDS = [
@@ -190,15 +193,40 @@ with DAG(
         },
     )
 
-    # profilePivotTable =  NesOperator(
-    #     task_id="profilePivotTable",
-    #     parameters={"current_dt": "{{ ds }}", "state": env},
-    #     input_nb="./domain_profile/adotServiceProfiles/notebook/pivoting_profile.ipynb",
-    # )
+    create_pivot_table = BigQueryCreateEmptyTableOperator(
+        task_id="create_pivot_table",
+        dataset_id=db_name,
+        table_id="adotServiceMultiProfilesPivotTable",
+        schema_fields=[
+            {"name": "profile_templates", "type": "STRING"},
+            {"name": "source_domain", "type": "STRING"},
+            {"name": "profile_id", "type": "STRING"},
+            {"name": "dt", "type": "DATE"},
+        ],
+        time_partitioning={
+            "field": "dt",
+            "type": "DAY",
+        },
+        exists_ok=True,
+    )
+
+    profile_pivot_table = create_nes_task(
+        dag=dag,
+        task_id="profile_pivot_table",
+        notebook_path=notebook_path,
+        notebook_name="pivoting_profile.ipynb",
+        parameters={"current_dt": "{{ ds }}", "state": env, "ttl": 30},
+        doc_md={
+            "task_description": "Profile 기준 pivotTable 생성 | User 단위 pivotTable 생성 ",
+            "output_tables": "adotServiceMultiProfilesPivotTable, adotServiceUnionUserProfiles",
+            "reference_tables": "adotServiceProfile_templated_tmbr, adotServiceProfile_templated_xdr, adotServiceProfile_templated_tdeal, adotServiceProfile_templated_tmap, adotServiceProfile_templated_adot",
+        },
+    )
 
     start >> nudge_offering_table >> end
+    start >> create_pivot_table
     (
-        start
+        create_pivot_table
         >> [
             profile_adot,
             profile_tdeal,
@@ -208,5 +236,6 @@ with DAG(
             profile_xdr_weekend,
             profile_adot_weekend,
         ]
+        >> profile_pivot_table
         >> end
     )
