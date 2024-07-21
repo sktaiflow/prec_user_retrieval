@@ -26,11 +26,22 @@ from macros.custom_slack import CallbackNotifier, SlackBot
 from macros.custom_nes_task import create_nes_task
 from macros.airflow_variables_templates import create_airflow_variables_enum
 
+##
+from airflow.settings import Session
+from airflow.models.variable import Variable
+
 local_tz = pendulum.timezone("Asia/Seoul")
 
+session = Session()
+try:
+    variables = session.query(Variable).all()
+    air_dict = {var.key: var.get_val() for var in variables}
+finally:
+    session.close()
+
 ### GET AIRFLOW VARIABLE ###
-AirflowVariables = create_airflow_variables_enum()
-print(AirflowVariables)
+# AirflowVariables = create_airflow_variables_enum()
+# print(AirflowVariables)
 
 env = Variable.get("env", "stg")
 hdfs_root_path = Variable.get("hdfs_root_path", "/data/adot/jaehwan")
