@@ -70,4 +70,4 @@ with DAG(
 
     start = DummyOperator(task_id="start", dag=dag)
     end = DummyOperator(task_id="end", dag=dag)
-    start >> end
+    start >> print_vars_operator >> end
