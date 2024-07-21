@@ -24,6 +24,15 @@ airflow_vars = create_airflow_variables_enum(
 logger = logging.getLogger(__name__)
 logger.info(f"This is a log message: {airflow_vars}")
 
+print(airflow_vars)
+
+env = Variable.get("env", "stg")
+hdfs_root_path = Variable.get("hdfs_root_path", "/data/adot/jaehwan")
+gcp_project_id = Variable.get("GCP_PROJECT_ID", "skt-datahub")
+nudge_api_token = Variable.get("nudge_offering_token", None)
+slack_conn_id = "slack_conn"
+CallbackNotifier.SLACK_CONN_ID = slack_conn_id
+
 local_tz = pendulum.timezone("Asia/Seoul")
 
 
