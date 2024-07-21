@@ -9,6 +9,7 @@ from airflow.decorators import dag, task
 from airflow.models.baseoperator import chain
 from airflow.operators.dummy import DummyOperator
 from airflow.models.variable import Variable
+from airflow.operators.python_operator import PythonOperator
 
 from macros.custom_slack import CallbackNotifier
 from macros.custom_nes_task import create_nes_task
@@ -53,7 +54,19 @@ with DAG(
     tags=["test"],
 ) as dag:
 
-    dag.doc_md = """User Profile && model Profile 만드는 DAG"""
+    dag.doc_md = """tests for custom plugins"""
+
+    def print_airflow_vars(airflow_vars):
+        # Assuming 'airflow_vars' is a dictionary containing Airflow variables
+        for key, value in airflow_vars.items():
+            print(f"{key}: {value}")
+
+    print_vars_operator = PythonOperator(
+        task_id="print_airflow_vars",
+        python_callable=print_airflow_vars,
+        op_kwargs={"airflow_vars": airflow_vars},
+        dag=dag,  # Ensure 'dag' is defined in your DAG file
+    )
 
     start = DummyOperator(task_id="start", dag=dag)
     end = DummyOperator(task_id="end", dag=dag)
