@@ -10,7 +10,7 @@ def create_nes_task(
     notebook_path: str,
     notebook_name: str = None,
     parameters: Dict = None,
-    doc_md_template: str = "task_description:{task_description} || output_tables:{output_tables} || reference_tables: {reference_tables}",
+    doc_md_template: str = "task_description:{task_description} || output_tables:{output_tables} || reference_tables: {reference_tables} || owner: {owner}",
     doc_md: Dict = {},
 ) -> NesOperator:
     """
@@ -28,7 +28,7 @@ def create_nes_task(
         NesOperator: The created NES task.
     """
 
-    if notebook_name is None:
+    if not notebook_name:
         notebook_name = f"{task_id}.ipynb"
 
     task = NesOperator(
@@ -41,11 +41,13 @@ def create_nes_task(
         task_description = doc_md.get("task_description", "")
         output_tables = doc_md.get("output_tables", "")
         reference_tables = doc_md.get("reference_tables", "")
+        owner = doc_md.get("owner", "jaehwan lee")
 
         doc_md_str = doc_md_template.format(
             task_description=task_description,
             output_tables=output_tables,
             reference_tables=reference_tables,
+            owner=owner,
         )
     else:
         doc_md_str = ""
