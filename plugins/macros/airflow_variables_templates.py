@@ -1,4 +1,6 @@
 from airflow.models.variable import Variable
+from airflow.settings import Session
+
 
 from .utils.enum import StrEnum
 
@@ -22,7 +24,12 @@ def merge_variables(airflow_vars, default_vars):
 
 def fetch_all_variables():
     """Fetch all registered Airflow variables."""
-    return Variable.get_val()
+    session = Session()
+    try:
+        variables = session.query(Variable).all()
+        return {var.key: var.get_val() for var in variables}
+    finally:
+        session.close()
 
 
 def create_airflow_variables_enum():
