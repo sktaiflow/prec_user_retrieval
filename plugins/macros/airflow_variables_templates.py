@@ -24,6 +24,7 @@ class DefaultVariables:
     def update_variables_from_dict(self, variables_dict):
         for key, value in variables_dict.items():
             self.update_variable(key, value)
+        return self
 
     def get_variable(self, key):
         return self.variables.get(key, None)
