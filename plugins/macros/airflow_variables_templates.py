@@ -1,4 +1,3 @@
-from enum import Enum
 from airflow.models.variable import Variable
 from .utils.enum import StrEnum
 
