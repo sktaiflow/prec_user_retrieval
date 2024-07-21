@@ -13,6 +13,16 @@ from airflow.models.variable import Variable
 from macros.custom_slack import CallbackNotifier
 from macros.custom_nes_task import create_nes_task
 from macros.airflow_variables_templates import create_airflow_variables_enum, DefaultVariables
+import logging
+
+
+extra_variables = {}
+airflow_vars = create_airflow_variables_enum(
+    DefaultVariables().update_variables_from_dict(extra_variables)
+)
+
+logger = logging.getLogger(__name__)
+logger.info(f"This is a log message: {airflow_vars}")
 
 local_tz = pendulum.timezone("Asia/Seoul")
 
