@@ -9,23 +9,20 @@ from airflow.decorators import dag, task
 from airflow.models.baseoperator import chain
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy import DummyOperator
-from airflow.operators.python_operator import BranchPythonOperator, PythonOperator
-from airflow.providers.google.cloud.sensors.bigquery import (
-    BigQueryTablePartitionExistenceSensor,
-)
 from airflow.models.variable import Variable
 from airflow.providers.sktvane.operators.nes import NesOperator
-from airflow.sensors.hive_partition_sensor import HivePartitionSensor
-from airflow.sensors.web_hdfs_sensor import WebHdfsSensor
 from airflow.utils import timezone
-from airflow.utils.edgemodifier import Label
 
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmptyTableOperator
 
-from macros.custom_slack import CallbackNotifier, SlackBot
+from macros.custom_slack import CallbackNotifier
 from macros.custom_nes_task import create_nes_task
 from macros.airflow_variables_templates import create_airflow_variables_enum, DefaultVariables
 
+import logging
+
+## get logger
+logger = logging.getLogger(__name__)
 
 local_tz = pendulum.timezone("Asia/Seoul")
 
@@ -35,6 +32,7 @@ airflow_vars = create_airflow_variables_enum(
     DefaultVariables().update_variables_from_dict(extra_variables)
 )
 
+logger.info(f"This is a log message: {airflow_vars}")
 print(airflow_vars)
 
 env = Variable.get("env", "stg")
