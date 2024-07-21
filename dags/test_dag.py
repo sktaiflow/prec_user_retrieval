@@ -10,6 +10,9 @@ from airflow.models.baseoperator import chain
 from airflow.operators.dummy import DummyOperator
 from airflow.models.variable import Variable
 
+from macros.custom_slack import CallbackNotifier
+from macros.custom_nes_task import create_nes_task
+
 local_tz = pendulum.timezone("Asia/Seoul")
 
 
