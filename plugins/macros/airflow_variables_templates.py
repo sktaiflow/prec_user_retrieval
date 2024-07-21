@@ -1,8 +1,7 @@
 from airflow.models.variable import Variable
-from airflow.settings import Session
-
 
 from .utils.enum import StrEnum
+from typing import Dict
 
 DEFAULT_VARIABLES = {
     "ENV": "stg",
@@ -15,28 +14,18 @@ DEFAULT_VARIABLES = {
 }
 
 
-def merge_variables(airflow_vars, default_vars):
-    """Merge Airflow variables with default variables."""
-    merged = default_vars.copy()
-    merged.update(airflow_vars)
-    return merged
-
-
-def fetch_all_variables():
+def fetch_variables(var_dict: Dict[str, str] = DEFAULT_VARIABLES) -> Dict[str, str]:
     """Fetch all registered Airflow variables."""
-    session = Session()
-    try:
-        variables = session.query(Variable).all()
-        return {var.key: var.get_val() for var in variables}
-    finally:
-        session.close()
+    for key in DEFAULT_VARIABLES.keys():
+        val = Variable.get(key)
+        var_dict[key] = val
+    return var_dict
 
 
 def create_airflow_variables_enum():
     """Create an Enum from merged Airflow and default variables. [priority: Airflow > Default variables]"""
-    airflow_vars = fetch_all_variables()
-    merged_vars = merge_variables(airflow_vars, DEFAULT_VARIABLES)
-    return StrEnum("AirflowVariables", merged_vars)
+    airflow_vars = fetch_variables()
+    return StrEnum("AirflowVariables", airflow_vars)
 
 
 class AirflowVariables(StrEnum):
