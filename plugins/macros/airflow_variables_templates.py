@@ -1,5 +1,6 @@
 from enum import Enum
 from airflow.models.variable import Variable
+from utils.enum import StrEnum
 
 
 DEFAULT_VARIABLES = {
@@ -27,10 +28,10 @@ def create_airflow_variables_enum():
     """Create an Enum from merged Airflow and default variables. [priority: Airflow > Default variables]"""
     airflow_vars = fetch_all_variables()
     merged_vars = merge_variables(airflow_vars, DEFAULT_VARIABLES)
-    return Enum("AirflowVariables", merged_vars)
+    return StrEnum("AirflowVariables", merged_vars)
 
 
-class AirflowVariables(Enum):
+class AirflowVariables(StrEnum):
     """Enum class to store all Airflow variables."""
 
     pass
