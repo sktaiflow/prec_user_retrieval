@@ -3,28 +3,43 @@ from airflow.models.variable import Variable
 from .utils.enum import StrEnum
 from typing import Dict
 
-DEFAULT_VARIABLES = {
-    "ENV": "stg",
-    "GCP_PROJECT_ID": "skt-datahub",
-    "DEBUG": "False",
-    "MAX_RETRIES": "3",
-    "slack_conn_id": "slack_conn",
-    "nudge_api_token": None,
-    # Add more default variables as needed
-}
+
+class DefaultVariablesEnum(StrEnum):
+    ENV = "stg"
+    GCP_PROJECT_ID = "skt-datahub"
+    DEBUG = "False"
+    MAX_RETRIES = "3"
+    SLACK_CONN_PROFILE_ALARMING = "slack_conn"
+    NUDGE_API_TOKEN = None
+    HDFS_PATH_PIVOT_PROFILE = "/data/adot/jaehwan"
 
 
-def fetch_variables(var_dict: Dict[str, str]) -> Dict[str, str]:
+class DefaultVariables:
+    def __init__(self):
+        self.variables = {var.name: var.value for var in DefaultVariablesEnum}
+
+    def update_variable(self, key, value):
+        self.variables[key] = value
+
+    def update_variables_from_dict(self, variables_dict):
+        for key, value in variables_dict.items():
+            self.update_variable(key, value)
+
+    def get_variable(self, key):
+        return self.variables.get(key, None)
+
+
+def fetch_variables(vars: DefaultVariables) -> Dict[str, str]:
     """Fetch all registered Airflow variables."""
-    for key in var_dict.keys():
+    for key in vars.variables.keys():
         val = Variable.get(key)
-        var_dict[key] = val
-    return var_dict
+        vars.update_variable(key, val)
+    return vars.variables
 
 
-def create_airflow_variables_enum(var_dict=DEFAULT_VARIABLES):
+def create_airflow_variables_enum(vars: DefaultVariables = DefaultVariables()) -> StrEnum:
     """Create an Enum from merged Airflow and default variables. [priority: Airflow > Default variables]"""
-    airflow_vars = fetch_variables(var_dict=var_dict)
+    airflow_vars = fetch_variables(vars=vars)
     return StrEnum("AirflowVariables", airflow_vars)
 
 
