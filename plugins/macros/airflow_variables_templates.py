@@ -14,17 +14,17 @@ DEFAULT_VARIABLES = {
 }
 
 
-def fetch_variables(var_dict: Dict[str, str] = DEFAULT_VARIABLES) -> Dict[str, str]:
+def fetch_variables(var_dict: Dict[str, str]) -> Dict[str, str]:
     """Fetch all registered Airflow variables."""
-    for key in DEFAULT_VARIABLES.keys():
+    for key in var_dict.keys():
         val = Variable.get(key)
         var_dict[key] = val
     return var_dict
 
 
-def create_airflow_variables_enum():
+def create_airflow_variables_enum(var_dict=DEFAULT_VARIABLES):
     """Create an Enum from merged Airflow and default variables. [priority: Airflow > Default variables]"""
-    airflow_vars = fetch_variables()
+    airflow_vars = fetch_variables(var_dict=var_dict)
     return StrEnum("AirflowVariables", airflow_vars)
 
 
