@@ -22,13 +22,15 @@ from airflow.utils.edgemodifier import Label
 
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmptyTableOperator
 
-
 from macros.custom_slack import CallbackNotifier, SlackBot
 from macros.custom_nes_task import create_nes_task
+from macros.airflow_variables_templates import create_airflow_variables_enum
 
 local_tz = pendulum.timezone("Asia/Seoul")
 
-### AIRFLOW VARIABLE ###
+### GET AIRFLOW VARIABLE ###
+AirflowVariables = create_airflow_variables_enum()
+print(AirflowVariables)
 
 env = Variable.get("env", "stg")
 hdfs_root_path = Variable.get("hdfs_root_path", "/data/adot/jaehwan")
@@ -53,7 +55,10 @@ ALARMING_TASK_IDS = [
     "profile_adot_weekend",
     "profile_tmbr",
     "end_profiling",
+    "profile_pivot_table",
+    "end",
 ]
+
 CallbackNotifier.SELECTED_TASK_IDS = ALARMING_TASK_IDS
 
 default_args = {
