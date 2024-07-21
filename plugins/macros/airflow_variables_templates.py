@@ -59,7 +59,7 @@ def fetch_variables(vars: DefaultVariables) -> Dict[str, str]:
     return vars.variables
 
 
-def create_airflow_variables_enum(vars: DefaultVariables = DefaultVariables()) -> StrEnum:
+def create_airflow_variables_enum(vars: DefaultVariables) -> StrEnum:
     """Create an Enum from merged Airflow and default variables. [priority: Airflow > Default variables]"""
     airflow_vars = fetch_variables(vars=vars)
     return StrEnum("AirflowVariables", airflow_vars)
