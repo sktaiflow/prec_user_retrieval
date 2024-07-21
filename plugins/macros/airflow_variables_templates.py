@@ -33,8 +33,11 @@ class DefaultVariables:
 def fetch_variables(vars: DefaultVariables) -> Dict[str, str]:
     """Fetch all registered Airflow variables."""
     for key in vars.variables.keys():
-        val = Variable.get(key)
-        vars.update_variable(key, val)
+        try:
+            val = Variable.get(key)
+            vars.update_variable(key, val)
+        except KeyError as e:
+            pass
     return vars.variables
 
 
