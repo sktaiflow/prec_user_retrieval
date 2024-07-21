@@ -1,6 +1,4 @@
-from airflow.models import variable
-
-# from airflow.models.variable import Variable
+from airflow.models.variable import Variable
 
 from .utils.enum import StrEnum
 
@@ -9,6 +7,8 @@ DEFAULT_VARIABLES = {
     "GCP_PROJECT_ID": "skt-datahub",
     "DEBUG": "False",
     "MAX_RETRIES": "3",
+    "slack_conn_id": "slack_conn",
+    "nudge_api_token": None,
     # Add more default variables as needed
 }
 
@@ -22,7 +22,7 @@ def merge_variables(airflow_vars, default_vars):
 
 def fetch_all_variables():
     """Fetch all registered Airflow variables."""
-    return variable.get_val()
+    return Variable.get_val()
 
 
 def create_airflow_variables_enum():
