@@ -10,36 +10,13 @@ from airflow.models.baseoperator import chain
 from airflow.operators.dummy import DummyOperator
 from airflow.models.variable import Variable
 
-from macros.custom_slack import CallbackNotifier
-
-from macros.airflow_variables_templates import create_airflow_variables_enum, DefaultVariables
-
-
 local_tz = pendulum.timezone("Asia/Seoul")
 
-env = Variable.get("env", "stg")
-hdfs_root_path = Variable.get("hdfs_root_path", "/data/adot/jaehwan")
-gcp_project_id = Variable.get("GCP_PROJECT_ID", "skt-datahub")
-nudge_api_token = Variable.get("nudge_offering_token", None)
-slack_conn_id = "slack_conn"
-CallbackNotifier.SLACK_CONN_ID = slack_conn_id
-
-## add Custom Variables
-notebook_path = f"./domain_profile/adotServiceProfiles/notebook"
-db_name = "adot_reco_dev"
-
-## add slack alarming task
-ALARMING_TASK_IDS = []
-
-CallbackNotifier.SELECTED_TASK_IDS = ALARMING_TASK_IDS
 
 default_args = {
     "retries": 24,
     "depends_on_past": False,
     "retry_delay": timedelta(hours=1),
-    "on_success_callback": CallbackNotifier.on_success_callback,
-    "on_failure_callback": CallbackNotifier.on_failure_callback,
-    "on_retry_callback": CallbackNotifier.on_retry_callback,
 }
 
 with DAG(
