@@ -1,6 +1,8 @@
-from airflow.models.variable import Variable
-from .utils.enum import StrEnum
+from airflow.models import variable
 
+# from airflow.models.variable import Variable
+
+from .utils.enum import StrEnum
 
 DEFAULT_VARIABLES = {
     "ENV": "stg",
@@ -20,7 +22,7 @@ def merge_variables(airflow_vars, default_vars):
 
 def fetch_all_variables():
     """Fetch all registered Airflow variables."""
-    return Variable.get_all()
+    return variable.get_val()
 
 
 def create_airflow_variables_enum():
