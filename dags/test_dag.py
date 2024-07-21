@@ -19,6 +19,8 @@ airflow_vars = create_airflow_variables_enum(
     DefaultVariables().update_variables_from_dict(extra_variables)
 )
 
+print(airflow_vars)
+
 local_tz = pendulum.timezone("Asia/Seoul")
 
 
