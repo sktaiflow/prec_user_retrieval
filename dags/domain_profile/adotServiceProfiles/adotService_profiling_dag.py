@@ -30,7 +30,7 @@ from macros.airflow_variables_templates import create_airflow_variables_enum, DE
 local_tz = pendulum.timezone("Asia/Seoul")
 
 ## GET AIRFLOW VARIABLE ###
-AirflowVariables = create_airflow_variables_enum(val_dict=DEFAULT_VARIABLES)
+AirflowVariables = create_airflow_variables_enum(var_dict=DEFAULT_VARIABLES)
 print(AirflowVariables)
 
 env = Variable.get("env", "stg")
