@@ -20,7 +20,7 @@ default_args = {
 }
 
 with DAG(
-    dag_id=f"test--{env}",
+    dag_id=f"test--stg",
     default_args=default_args,
     description="DAG with own plugins",
     schedule="0 15 * * *",
