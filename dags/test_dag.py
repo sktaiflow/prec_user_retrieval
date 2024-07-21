@@ -14,13 +14,6 @@ from macros.custom_slack import CallbackNotifier
 from macros.custom_nes_task import create_nes_task
 from macros.airflow_variables_templates import create_airflow_variables_enum, DefaultVariables
 
-extra_variables = {}
-airflow_vars = create_airflow_variables_enum(
-    DefaultVariables().update_variables_from_dict(extra_variables)
-)
-
-print(airflow_vars)
-
 local_tz = pendulum.timezone("Asia/Seoul")
 
 
