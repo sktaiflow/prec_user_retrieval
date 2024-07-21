@@ -1,6 +1,6 @@
 from enum import Enum
 from airflow.models.variable import Variable
-from utils.enum import StrEnum
+from .utils.enum import StrEnum
 
 
 DEFAULT_VARIABLES = {
