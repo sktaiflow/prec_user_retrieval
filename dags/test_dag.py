@@ -11,18 +11,7 @@ from airflow.operators.dummy import DummyOperator
 from airflow.models.variable import Variable
 
 from macros.custom_slack import CallbackNotifier
-from macros.airflow_variables_templates import create_airflow_variables_enum, DefaultVariables
 
-
-local_tz = pendulum.timezone("Asia/Seoul")
-
-## GET AIRFLOW VARIABLE ###
-extra_variables = {}
-airflow_vars = create_airflow_variables_enum(
-    DefaultVariables().update_variables_from_dict(extra_variables)
-)
-
-print(airflow_vars)
 
 env = Variable.get("env", "stg")
 hdfs_root_path = Variable.get("hdfs_root_path", "/data/adot/jaehwan")
