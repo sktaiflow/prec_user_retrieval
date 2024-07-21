@@ -43,11 +43,6 @@ project_id = Variable.get("GCP_PROJECT_ID", "skt-datahub")
 db_name = "adot_reco"
 slack_conn_id = "slack_conn"
 CallbackNotifier.SLACK_CONN_ID = slack_conn_id
-temp="url = "http://insight.nugu.co.kr/psionic/v1/api/export/edf_1718241386286"
-headers = {
-    "Content-Type": "application/json", 
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiYXJjaG9uLW1ldGEtc2VydmVyIiwiYXJjaG9uLXViZXIiLCJwc2lvbmljLXNlcnZlciIsIm51Z3UtaW5zaWdodC1hcGkiLCJhcmNob24td2ViIl0sInVzZXJfbmFtZSI6InBzaW9uaWMiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxOTE4NzA2MjU2LCJhdXRob3JpdGllcyI6WyJVU0VSIiwiTUVNQkVSIl0sImp0aSI6ImM3MmQ0NGIxLWNlNDQtNGM0Ny1iMDJkLTRiMTI3ZDQxZDNkZiIsImNsaWVudF9pZCI6InBzaW9uaWMtc2VydmVyIn0.S1ZaaNNMcWhFpMr1Qt8ELckkBqPTlnHN8dfJ29i-Ry0" 
-}"
 ## add Custom Variables
 
 common_process_notebook_path = "./common/preprocessing/notebook"
