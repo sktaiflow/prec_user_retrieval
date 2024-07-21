@@ -1,3 +1,8 @@
+"""
+### DAG Documentation
+이 DAG는 HivePartitionSensor를 사용하는 예제입니다.
+"""
+
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -9,32 +14,26 @@ from airflow.decorators import dag, task
 from airflow.models.baseoperator import chain
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.dummy import DummyOperator
+from airflow.operators.python_operator import BranchPythonOperator, PythonOperator
+from airflow.providers.google.cloud.sensors.bigquery import (
+    BigQueryTablePartitionExistenceSensor,
+)
 from airflow.models.variable import Variable
 from airflow.providers.sktvane.operators.nes import NesOperator
+from airflow.sensors.hive_partition_sensor import HivePartitionSensor
+from airflow.sensors.web_hdfs_sensor import WebHdfsSensor
 from airflow.utils import timezone
+from airflow.utils.edgemodifier import Label
 
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmptyTableOperator
 
-from macros.custom_slack import CallbackNotifier
+
+from macros.custom_slack import CallbackNotifier, SlackBot
 from macros.custom_nes_task import create_nes_task
-
-# from macros.airflow_variables_templates import create_airflow_variables_enum, DefaultVariables
-
-import logging
-
-## get logger
-logger = logging.getLogger(__name__)
 
 local_tz = pendulum.timezone("Asia/Seoul")
 
-## GET AIRFLOW VARIABLE ###
-# extra_variables = {}
-# airflow_vars = create_airflow_variables_enum(
-#     DefaultVariables().update_variables_from_dict(extra_variables)
-# )
-
-# logger.info(f"This is a log message: {airflow_vars}")
-# print(airflow_vars)
+### AIRFLOW VARIABLE ###
 
 env = Variable.get("env", "stg")
 hdfs_root_path = Variable.get("hdfs_root_path", "/data/adot/jaehwan")
@@ -59,10 +58,7 @@ ALARMING_TASK_IDS = [
     "profile_adot_weekend",
     "profile_tmbr",
     "end_profiling",
-    "profile_pivot_table",
-    "end",
 ]
-
 CallbackNotifier.SELECTED_TASK_IDS = ALARMING_TASK_IDS
 
 default_args = {
