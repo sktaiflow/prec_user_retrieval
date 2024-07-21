@@ -24,13 +24,16 @@ from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmpt
 
 from macros.custom_slack import CallbackNotifier, SlackBot
 from macros.custom_nes_task import create_nes_task
-from macros.airflow_variables_templates import create_airflow_variables_enum, DEFAULT_VARIABLES
+from macros.airflow_variables_templates import create_airflow_variables_enum, DefaultVariables
 
 
 local_tz = pendulum.timezone("Asia/Seoul")
 
 ## GET AIRFLOW VARIABLE ###
-AirflowVariables = create_airflow_variables_enum(var_dict=DEFAULT_VARIABLES)
+extra_variables = {}
+airflow_vars = DefaultVariables().update_variables_from_dict(extra_variables)
+AirflowVariables = create_airflow_variables_enum(default_variables=airflow_vars)
+
 print(AirflowVariables)
 
 env = Variable.get("env", "stg")
